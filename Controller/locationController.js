@@ -117,3 +117,67 @@ export const deleteById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// export const deleteMany = async (req, res) => {
+// console.log("Hello");
+//   try {
+//     const { ids } = req.body; 
+
+//     if (!Array.isArray(ids) || ids.length === 0) {
+//       return res.status(400).json({ message: "Invalid or missing IDs array" });
+//     }
+
+    
+//     const areIdsValid = ids.every((id) => mongoose.Types.ObjectId.isValid(id));
+//     if (!areIdsValid) {
+//       return res.status(400).json({ message: "One or more IDs are invalid" });
+//     }
+
+//     // Perform bulk deletion
+//     const result = await Location.deleteMany({ _id: { $in: ids } });
+
+//     if (result.deletedCount === 0) {
+//       return res.status(404).json({ message: "No locations found for the provided IDs" });
+//     }
+
+//     res.status(200).json({
+//       message: "Locations deleted successfully",
+//       deletedCount: result.deletedCount,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+export const deleteMany = async (req, res) => {
+  
+  try {
+    const { ids } = req.body;
+
+    // Ensure the ids are valid MongoDB ObjectIds
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: "Invalid or missing IDs array" });
+    }
+
+    // Validate that each id is a valid ObjectId
+    const areIdsValid = ids.every((id) => mongoose.Types.ObjectId.isValid(id));
+    if (!areIdsValid) {
+      return res.status(400).json({ message: "One or more IDs are invalid" });
+    }
+
+    // Perform bulk deletion using the ids directly
+    const result = await Location.deleteMany({ _id: { $in: ids } });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: "No locations found for the provided IDs" });
+    }
+
+    res.status(200).json({
+      message: "Locations deleted successfully",
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
